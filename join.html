@@ -23,7 +23,7 @@ let roomCode, playerId, myHand=[], selectedPiece=null, myScore=0;
 let roomRef, playerRef;
 
 // ── Init ─────────────────────────────────────────────────────────
-document.getElementById('logoImg').src = LOGO_IMG;
+// Logo set after DOM ready (handled in initDOM or inline)
 
 // Get room from URL
 const params = new URLSearchParams(location.search);
@@ -47,10 +47,42 @@ function flash(msg,ok=true){
 }
 
 // ── JOIN ─────────────────────────────────────────────────────────
-document.getElementById('btnJoin').addEventListener('click', joinGame);
-document.getElementById('nameInput').addEventListener('keypress', e=>{
-  if(e.key==='Enter') joinGame();
-});
+// Wait for DOM to be ready before attaching events
+function initDOM() {
+  var btn = document.getElementById('btnJoin');
+  var inp = document.getElementById('nameInput');
+  if (!btn || !inp) {
+    setTimeout(initDOM, 50);
+    return;
+  }
+  btn.addEventListener('click', joinGame);
+  inp.addEventListener('keypress', function(e) {
+    if(e.key==='Enter') joinGame();
+  });
+
+  // Set logo
+  var logoEl = document.getElementById('logoImg');
+  if (logoEl) logoEl.src = LOGO_IMG;
+
+  // Pre-fill room code from URL param
+  var p = new URLSearchParams(location.search);
+  var rc = p.get('room');
+  if (rc) {
+    roomCode = rc.toUpperCase();
+    var codeEl = document.getElementById('codeInput');
+    var prefill = document.getElementById('roomPrefill');
+    if (codeEl) codeEl.style.display = 'none';
+    if (prefill) {
+      prefill.style.display = 'block';
+      prefill.textContent = '房間代碼：' + roomCode;
+    }
+  }
+}
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initDOM);
+} else {
+  initDOM();
+}
 
 async function joinGame(){
   const nameEl = document.getElementById('nameInput');
@@ -442,14 +474,6 @@ input.txt::placeholder{color:rgba(255,255,255,.2)}
 </div>
 
 <div class="flash" id="flash"></div>
-<script>
-// Show room code input only if not pre-filled
-const p=new URLSearchParams(location.search);
-const rc=p.get('room');
-if(rc){
-  document.getElementById('codeInput').style.display='none';
-  document.getElementById('roomPrefill').style.display='block';
-}
-</script>
+<!-- room prefill handled in module -->
 </body>
 </html>
