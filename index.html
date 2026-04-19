@@ -86,21 +86,11 @@ document.getElementById('btnCreate').addEventListener('click', async ()=>{
   document.getElementById('joinUrlText').textContent = joinUrl;
   document.getElementById('joinUrlLink').href = joinUrl;
 
-  // Generate QR using QRCode.js (no external API)
-  // Generate QR with inline QRious library
-  const qrContainer = document.getElementById('qrCanvas');
-  qrContainer.innerHTML = '';
-  const qrCanvas = document.createElement('canvas');
-  qrCanvas.width = 164; qrCanvas.height = 164;
-  qrContainer.appendChild(qrCanvas);
-  new window.QRious({
-    element: qrCanvas,
-    value: joinUrl,
-    size: 164,
-    background: '#ffffff',
-    foreground: '#000000',
-    level: 'M'
-  });
+  // Trigger QR generation via custom event (bridges module → global scope)
+  // Small delay ensures pg-room is visible before QR canvas renders
+  setTimeout(function() {
+    window.dispatchEvent(new CustomEvent('generateQR', { detail: { url: joinUrl } }));
+  }, 150);
 
   // Listen for players joining
   onValue(ref(db,'rooms/'+roomCode+'/players'), snap=>{
@@ -428,7 +418,9 @@ body::before{content:"";position:fixed;inset:0;
   <div class="room-layout">
     <div class="qr-card">
       <div id="qrCanvas" style="width:180px;height:180px;background:#fff;border-radius:10px;padding:8px;overflow:hidden"></div>
-      <a class="qr-url" id="joinUrlLink" href="#" target="_blank" id="joinUrlText">載入中...</a>
+      <a class="qr-url" id="joinUrlLink" href="#" target="_blank">
+        <span id="joinUrlText">載入中...</span>
+      </a>
       <div class="rcode-label">或直接輸入房間代碼</div>
       <div class="room-code-big" id="roomCodeBig">----</div>
     </div>
@@ -474,5 +466,41 @@ body::before{content:"";position:fixed;inset:0;
 </div>
 
 <div class="flash" id="flash"></div>
+
+<script>
+// Bridge: listens for generateQR event from module and renders QR code
+window.addEventListener('generateQR', function(e) {
+  var joinUrl = e.detail.url;
+
+  // Update URL display
+  var urlEl = document.getElementById('joinUrlText');
+  if (urlEl) urlEl.textContent = joinUrl;
+  var linkEl = document.getElementById('joinUrlLink');
+  if (linkEl) linkEl.href = joinUrl;
+
+  // Render QR
+  var container = document.getElementById('qrCanvas');
+  if (!container) return;
+  container.innerHTML = '';
+  var canvas = document.createElement('canvas');
+  canvas.width = 164;
+  canvas.height = 164;
+  container.appendChild(canvas);
+
+  if (window.QRious) {
+    new QRious({
+      element: canvas,
+      value: joinUrl,
+      size: 164,
+      background: '#ffffff',
+      foreground: '#000000',
+      level: 'M'
+    });
+  } else {
+    // Fallback: show URL as text if QRious not available
+    container.innerHTML = '<div style="font-size:9px;color:#000;padding:8px;word-break:break-all;background:#fff;width:164px;height:164px;display:flex;align-items:center;text-align:center">' + joinUrl + '</div>';
+  }
+});
+</script>
 </body>
 </html>
