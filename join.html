@@ -335,29 +335,59 @@ function startListening() {
 }
 
 // ── GAME ──────────────────────────────────────────────────────────
+var gameStarted = false;
 function startGame() {
-  if (document.getElementById('pg-game').style.display === 'flex') return;
+  if (gameStarted) return;
+  console.log("[HT] startGame called, roomCode:", roomCode, "playerId:", playerId);
+  // Read hand with retry (handles race condition where hand not yet written)
+  loadHandAndStart(0);
+}
 
+function loadHandAndStart(attempt) {
+  console.log("[HT] loadHandAndStart attempt:", attempt);
   db.ref('rooms/' + roomCode + '/players/' + playerId).once('value').then(function(snap) {
     var pd = snap.val() || {};
-    myHand = pd.hand || [];
-    myScore = 0;
-    selectedPiece = null;
-    show('pg-game');
-    initBoard();
-    renderHand();
-    document.getElementById('gScore').textContent = '0 分';
+    var hand = pd.hand;
+    console.log("[HT] player data:", JSON.stringify(pd));
 
-    // Apply existing placements
-    db.ref('rooms/' + roomCode + '/placements').once('value').then(function(ps) {
-      var pl = ps.val() || {};
-      Object.entries(pl).forEach(function(e) {
-        placePieceOnBoard(parseInt(e[0]), e[1].emoji || '');
-        myHand = myHand.filter(function(p){ return p !== parseInt(e[0]); });
-      });
-      updateProgress(Object.keys(pl).length);
-      renderHand();
+    // If hand not yet written, retry up to 20 times (10 seconds)
+    if (!hand || (Array.isArray(hand) && hand.length === 0) || Object.keys(hand||{}).length === 0) {
+      if (attempt < 20) {
+        setTimeout(function(){ loadHandAndStart(attempt + 1); }, 500);
+      } else {
+        // Give up - show empty game anyway
+        beginGame([]);
+      }
+      return;
+    }
+
+    // Firebase stores arrays as objects with numeric keys
+    var handArr = Array.isArray(hand) ? hand : Object.values(hand).map(Number);
+    beginGame(handArr);
+  });
+}
+
+function beginGame(handArr) {
+  console.log("[HT] beginGame, hand:", handArr);
+  gameStarted = true;
+  myHand = handArr;
+  myScore = 0;
+  selectedPiece = null;
+  show('pg-game');
+  initBoard();
+  renderHand();
+  document.getElementById('gScore').textContent = '0 分';
+
+  // Apply existing placements
+  db.ref('rooms/' + roomCode + '/placements').once('value').then(function(ps) {
+    var pl = ps.val() || {};
+    Object.entries(pl).forEach(function(e) {
+      var pi = parseInt(e[0]);
+      placePieceOnBoard(pi, e[1].emoji || '');
+      myHand = myHand.filter(function(p){ return p !== pi; });
     });
+    updateProgress(Object.keys(pl).length);
+    renderHand();
   });
 }
 
