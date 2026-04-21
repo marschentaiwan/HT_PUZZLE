@@ -2333,21 +2333,21 @@ body::before{content:"";position:fixed;inset:0;
 .logo-row img{height:26px}
 .logo-row span{font-family:"Bebas Neue",sans-serif;font-size:13px;letter-spacing:3px;color:var(--g)}
 .hero{text-align:center}
-.hero .em{font-size:68px;display:block;margin-bottom:10px;
+.hero .em{font-size:78px;display:block;margin-bottom:14px;
   animation:float 3s ease-in-out infinite}
 @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
-.hero h1{font-family:"Bebas Neue",sans-serif;font-size:44px;letter-spacing:3px;line-height:1.1}
-.hero h1 em{color:var(--g);font-style:normal}
-.hero p{font-size:12px;color:var(--mg);margin-top:6px;line-height:1.7}
+.hero h1{font-family:"Bebas Neue",sans-serif;font-size:64px;letter-spacing:3px;line-height:1.05;color:#7EE8A5}
+.hero h1 em{color:#5DE87A;font-style:normal}
+.hero p{font-size:16px;color:#B8D4C3;margin-top:10px;line-height:1.7;font-weight:500}
 .info-row{display:flex;gap:10px;max-width:320px;width:100%}
 .ic{flex:1;background:rgba(255,255,255,.05);border:1px solid var(--dim);
-  border-radius:12px;padding:12px;text-align:center}
-.ic .n{font-family:"Bebas Neue",sans-serif;font-size:30px;color:var(--g)}
-.ic .l{font-size:10px;color:var(--mg);margin-top:2px}
-.btn-g{background:var(--g);color:var(--dk);border:none;border-radius:12px;
-  padding:15px 32px;font-size:16px;font-weight:900;font-family:"Noto Sans TC",sans-serif;
-  cursor:pointer;width:100%;max-width:320px;letter-spacing:.5px;
-  box-shadow:0 4px 20px rgba(29,185,84,.35);transition:transform .12s}
+  border-radius:14px;padding:16px 12px;text-align:center}
+.ic .n{font-family:"Bebas Neue",sans-serif;font-size:42px;color:#5DE87A}
+.ic .l{font-size:13px;color:#A8C5B3;margin-top:4px;font-weight:500}
+.btn-g{background:var(--g);color:var(--dk);border:none;border-radius:14px;
+  padding:18px 32px;font-size:18px;font-weight:900;font-family:"Noto Sans TC",sans-serif;
+  cursor:pointer;width:100%;max-width:340px;letter-spacing:.8px;
+  box-shadow:0 6px 24px rgba(29,185,84,.4);transition:transform .12s}
 .btn-g:active{transform:scale(.96)}
 .btn-g:disabled{opacity:.3;cursor:not-allowed}
 .btn-ghost{background:rgba(255,255,255,.07);color:var(--w);border:1px solid var(--dim);
@@ -2451,8 +2451,8 @@ body::before{content:"";position:fixed;inset:0;
   </div>
   <div class="hero">
     <span class="em">🧩</span>
-    <h1>Human Touch<br><em>拼圖挑戰</em></h1>
-    <p>多人即時拼圖遊戲 · 全員掃碼加入，一起還原完整 Human Touch 承諾！</p>
+    <h1>Human Touch<br><em>大家作伙拼</em></h1>
+    <p>全員掃碼加入，一起還原完整 Human Touch 承諾！</p>
   </div>
   <div class="info-row">
     <div class="ic"><div class="n">30</div><div class="l">拼圖片數</div></div>
@@ -2486,7 +2486,7 @@ body::before{content:"";position:fixed;inset:0;
 <!-- GAME (HOST VIEW) -->
 <div id="pg-game" class="pg" style="padding:0;justify-content:flex-start;align-items:stretch">
   <div class="g-hdr">
-    <div class="g-title">🧩 HT 拼圖挑戰</div>
+    <div class="g-title">🧩 Human Touch 大挑戰</div>
     <div class="g-pw"><div class="g-pb" id="hProg" style="width:0%"></div></div>
     <div class="g-pt" id="hProgTxt">0 / 30</div>
   </div>
